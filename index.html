@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民生民意杯 · 选题投票系统</title>
+<style>
+  :root {
+    --bg: #f5f3ef;
+    --card: #ffffff;
+    --text: #2c2416;
+    --muted: #6b5e4a;
+    --accent: #b5343a;
+    --accent-hover: #8b1a1f;
+    --gold: #c49b2c;
+    --gold-light: #fdf3d0;
+    --border: #e0d8c8;
+    --tag-bg: #faf6ed;
+    --shadow: 0 2px 12px rgba(0,0,0,.06);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,.10);
+    --radius: 12px;
+    --radius-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #3d2e1c 0%, #5a3e2b 40%, #8b5a3c 100%);
+    color: #faf6ed;
+    padding: 48px 24px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L55 30 L30 55 L5 30Z' fill='none' stroke='rgba(255,255,255,.04)' stroke-width='1'/%3E%3C/svg%3E") repeat;
+    pointer-events: none;
+  }
+  .header-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .header .tag {
+    display: inline-block;
+    border: 1px solid rgba(255,255,255,.3);
+    color: #f0d78c;
+    font-size: 13px;
+    padding: 4px 16px;
+    border-radius: 20px;
+    letter-spacing: .08em;
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: clamp(26px, 5vw, 44px);
+    font-weight: 800;
+    letter-spacing: .03em;
+    margin-bottom: 8px;
+  }
+  .header .sub {
+    font-size: 15px;
+    opacity: .75;
+    font-weight: 400;
+  }
+
+  .stats-bar {
+    max-width: 1200px;
+    margin: -18px auto 0;
+    padding: 0 24px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+  }
+  .stat-card {
+    flex: 1 1 140px;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    min-width: 120px;
+  }
+  .stat-card .num { font-size: 28px; font-weight: 800; color: var(--accent); }
+  .stat-card .lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .main { max-width: 1200px; margin: 28px auto 60px; padding: 0 24px; }
+
+  .section { margin-bottom: 36px; scroll-margin-top: 20px; }
+  .section-head {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px; padding-left: 4px;
+  }
+  .section-head h2 { font-size: 20px; font-weight: 700; letter-spacing: .02em; }
+  .section-head .badge {
+    font-size: 12px; background: var(--tag-bg); color: var(--muted);
+    padding: 2px 10px; border-radius: 12px; border: 1px solid var(--border);
+  }
+
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 18px;
+  }
+  .topic-card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 22px 24px 18px; box-shadow: var(--shadow);
+    border: 1px solid transparent;
+    transition: box-shadow .2s, border-color .2s, transform .2s;
+    display: flex; flex-direction: column; position: relative;
+  }
+  .topic-card:hover {
+    box-shadow: var(--shadow-hover); border-color: var(--border);
+    transform: translateY(-2px);
+  }
+  .topic-card .idx {
+    position: absolute; top: 14px; right: 16px;
+    font-size: 12px; color: #c4b99a; font-weight: 600; letter-spacing: .04em;
+  }
+  .topic-card h3 {
+    font-size: 16px; font-weight: 700; line-height: 1.5;
+    margin-bottom: 10px; padding-right: 40px; color: #3d2e1c;
+  }
+  .topic-card .oneliner {
+    font-size: 13px; color: var(--accent); background: #fef6f6;
+    padding: 6px 12px; border-radius: var(--radius-sm);
+    margin-bottom: 14px; border-left: 3px solid var(--accent); line-height: 1.5;
+  }
+  .topic-card .advantages {
+    list-style: none; font-size: 13px; color: var(--muted); flex: 1;
+  }
+  .topic-card .advantages li {
+    padding: 3px 0 3px 18px; position: relative; line-height: 1.6;
+  }
+  .topic-card .advantages li::before {
+    content: '✦'; position: absolute; left: 0;
+    color: #c49b2c; font-size: 8px; top: 6px;
+  }
+  .topic-card .advantages li strong { color: #5a3e2b; font-weight: 600; }
+
+  .vote-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);
+  }
+  .vote-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 18px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: 1.5px solid var(--border); background: #fff;
+    color: var(--muted); transition: all .18s;
+    user-select: none; white-space: nowrap;
+  }
+  .vote-btn:hover { border-color: var(--accent); color: var(--accent); background: #fef6f6; }
+  .vote-btn.voted {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+    box-shadow: 0 2px 8px rgba(181,52,58,.3);
+  }
+  .vote-btn.voted:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .vote-count { font-size: 13px; font-weight: 600; color: var(--muted); min-width: 48px; text-align: center; }
+  .vote-bar-wrap { flex: 1; height: 6px; background: #f0ebe0; border-radius: 3px; overflow: hidden; min-width: 40px; }
+  .vote-bar-fill {
+    height: 100%; background: linear-gradient(90deg, #e0c87c, #c49b2c);
+    border-radius: 3px; transition: width .4s ease;
+  }
+
+  .nav-wrap {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(245,243,239,.92); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px; overflow-x: auto; white-space: nowrap;
+  }
+  .nav-wrap::-webkit-scrollbar { height: 0; }
+  .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 6px; flex-wrap: nowrap; }
+  .nav-chip {
+    display: inline-block; padding: 6px 14px; border-radius: 18px;
+    font-size: 13px; cursor: pointer; border: 1px solid var(--border);
+    background: #fff; color: var(--muted); font-weight: 500;
+    transition: all .15s; white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .toast {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    background: #3d2e1c; color: #faf6ed; padding: 10px 24px;
+    border-radius: 24px; font-size: 14px; font-weight: 600;
+    z-index: 999; opacity: 0; pointer-events: none;
+    transition: opacity .3s; box-shadow: 0 6px 20px rgba(0,0,0,.25);
+  }
+  .toast.show { opacity: 1; }
+
+  .footer { text-align: center; padding: 24px; font-size: 12px; color: #b8a98b; }
+
+  @media (max-width: 500px) {
+    .topic-grid { grid-template-columns: 1fr; }
+    .topic-card { padding: 18px 16px 14px; }
+    .topic-card h3 { font-size: 15px; }
+  }
+
+  .topic-card.self-voted { border-color: #e8c8ca; background: #fffcfc; }
+
+  .reset-area { text-align: center; margin-top: 32px; }
+  .reset-btn {
+    display: inline-block; padding: 8px 24px; border-radius: 20px;
+    font-size: 13px; cursor: pointer; border: 1px dashed #c4b99a;
+    background: transparent; color: #9b8b6e; font-weight: 500; transition: all .15s;
+  }
+  .reset-btn:hover { border-color: var(--accent); color: var(--accent); background: #fef6f6; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <span class="tag">浙江省民生民意杯</span>
+    <h1>选题投票系统</h1>
+    <p class="sub">文旅融合 · 数字化传播 · 就业形态 · 社区养老 · 低空经济 · 青年发展</p>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-card"><div class="num" id="totalTopics">—</div><div class="lbl">选题总数</div></div>
+  <div class="stat-card"><div class="num" id="totalVotes">—</div><div class="lbl">累计票数</div></div>
+  <div class="stat-card"><div class="num" id="totalVoters">—</div><div class="lbl">投票人次</div></div>
+  <div class="stat-card"><div class="num" id="leadTopic">—</div><div class="lbl">当前领先</div></div>
+</div>
+
+<div class="nav-wrap" id="navWrap">
+  <div class="nav-inner" id="navInner"></div>
+</div>
+
+<div class="main" id="mainContent"></div>
+
+<div class="reset-area">
+  <button class="reset-btn" onclick="resetMyVotes()">&#8634; 取消我的全部投票</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="footer">浙江省民生民意杯 · 选题投票系统 — 数据存储在浏览器本地</div>
+
+<script>
+// DATA
+const TOPICS = [
+  {
+    id: 1,
+    section: "文旅融合与消费转化",
+    title: "让打卡变成下单——温州非遗美食文旅消费的转化之路",
+    oneliner: "把“游客来了不花钱”的真问题，包装成有传播力的标题",
+    advantages: [
+      "<strong>问题导向强：</strong>“打卡→下单”直击“有人气没财气”的文旅痛点",
+      "<strong>标题有张力：</strong>两个“打”字对仗，朗朗上口，传播性强",
+      "<strong>行动导向：</strong>“转化之路”不停留在描述现象，要找出转化路径"
+    ]
+  },
+  {
+    id: 2,
+    section: "文旅融合与消费转化",
+    title: "把瓯味端上文旅的餐桌——温州非遗美食供需对接路径调查",
+    oneliner: "双向数据是最大卖点，“供需错位”的发现极具冲击力",
+    advantages: [
+      "<strong>“瓯味”有辨识度：</strong>有地域文化底蕴和文学性，在一堆平铺直叙的标题中很突出",
+      "<strong>双向数据硬实力：</strong>500+消费者 × 120+商户双向匹配设计，可做供需交叉分析",
+      "<strong>建设性立场：</strong>不追问对得上吗，而是找出怎么对接上"
+    ]
+  },
+  {
+    id: 3,
+    section: "文旅融合与消费转化",
+    title: "一碗一城，何以留客——温州非遗小吃对游客吸引力与消费体验的实证调研",
+    oneliner: "四字定调、街区锚定、实证驱动——小而精准的研究设计",
+    advantages: [
+      "<strong>“一碗一城”浓缩有力：</strong>四字讲清“美食—城市—旅游”三者关系",
+      "<strong>“何以留客”追问有深度：</strong>追问靠什么留住游客，探究背后的机制",
+      "<strong>地理锚定可操作：</strong>明确列出五马街、纱帽河等调研街区",
+      "<strong>实证定位清晰：</strong>基于真实游客访问和体验数据"
+    ]
+  },
+  {
+    id: 4,
+    section: "文旅融合与消费转化",
+    title: "美食文旅融合数字化传播助力温州老城区烟火气焕新研究",
+    oneliner: "数字化手段 × 老城区场景 × 烟火气目标，三层递进有层次",
+    advantages: [
+      "<strong>“烟火气”有温度：</strong>替代“商业活力”等冷冰冰的词，有生活气息",
+      "<strong>“老城区”场景具体：</strong>容易找到具体案例街区",
+      "<strong>三层递进逻辑清晰：</strong>数字化传播 → 文旅融合 → 烟火气焕新",
+      "<strong>“焕新”比“振兴”更贴切：</strong>在保留原有烟火气基础上注入新活力"
+    ]
+  },
+  {
+    id: 5,
+    section: "数字化传播与年轻化",
+    title: "数字化平台赋能下温州市井美食便民化升级民意调研",
+    oneliner: "最接地气的选题 × 最现成的数据 × 最契合竞赛主题",
+    advantages: [
+      "<strong>“市井美食”定位精准：</strong>聚焦最接地气、和老百姓日常生活最相关的部分",
+      "<strong>“便民化升级”紧扣民生痛点：</strong>落脚到能不能让老百姓更方便地吃到想吃的东西",
+      "<strong>“民意调研”呼应竞赛主题：</strong>与“民生民意杯”主题高度契合",
+      "<strong>现成研究抓手多：</strong>外卖平台、点评平台等都有现成数据"
+    ]
+  },
+  {
+    id: 6,
+    section: "数字化传播与年轻化",
+    title: "数智赋能与乡愁锚定——温州非遗美食短视频传播对Z世代消费决策的影响机制研究",
+    oneliner: "技术×情感的二元框架，Z世代精准定位，学术性和现实感兼备",
+    advantages: [
+      "<strong>双轮驱动框架清晰：</strong>“数智赋能”+“乡愁锚定”，两个维度共同作用",
+      "<strong>Z世代群体精准：</strong>短视频核心用户 + 非遗传承关键受众",
+      "<strong>“影响机制研究”学术感强：</strong>探究短视频通过什么路径影响消费决策",
+      "<strong>“科技+人文”组合有辨识度：</strong>前沿技术+传统情感"
+    ]
+  },
+  {
+    id: 7,
+    section: "侨乡与在地化",
+    title: "侨乡味道的在地化账本——瑞安、文成侨村非遗美食的游客体验与村民收益分配研究",
+    oneliner: "温州独有侨乡标签 + 游客/村民双视角 + 收益分配真问题",
+    advantages: [
+      "<strong>“在地化账本”说法新颖：</strong>学术概念+生活化表达，有理论深度又接地气",
+      "<strong>双视角设计有深度：</strong>游客满意度 + 村民真实收益分配",
+      "<strong>两个样本点扎实：</strong>瑞安、文成两个侨村，具体田野调查点",
+      "<strong>侨乡是温州独特标签：</strong>地域辨识度极高，不易撞车"
+    ]
+  },
+  {
+    id: 8,
+    section: "新就业形态与灵活就业",
+    title: "“一件几毛钱”——快递驿站从业者的微利生存与社区末端配送的民意选择",
+    oneliner: "“一件几毛钱”瞬间感知快递驿站的微利处境，民生底色浓厚",
+    advantages: [
+      "<strong>标题直击痛点：</strong>“一件几毛钱”让人瞬间感知微利处境",
+      "<strong>视角有人文关怀：</strong>关注基层劳动者真实生存状态",
+      "<strong>“民意选择”扣题：</strong>把末端配送拉回“民意”视角，与竞赛主题高度契合"
+    ]
+  },
+  {
+    id: 9,
+    section: "新就业形态与灵活就业",
+    title: "“团长是我邻居”——社区团购团长群体的生计模式与社区关系变迁调查",
+    oneliner: "打破纯商业化刻板印象，唤起社区人情味，双重变迁视角",
+    advantages: [
+      "<strong>“邻居”身份有温度：</strong>“团长是我邻居”唤起社区人情味",
+      "<strong>双重变迁视角：</strong>既看团长个人生计模式变化，也看社区关系重构",
+      "<strong>新就业形态典型样本：</strong>社区团购团长是近年最典型的新就业形态之一"
+    ]
+  },
+  {
+    id: 10,
+    section: "社区养老与社会保障",
+    title: "老龄化背景下温州乡村居家养老服务供给短板与老年民意需求调研",
+    oneliner: "乡村+居家养老精准聚焦，供需双侧分析，与竞赛定位一致",
+    advantages: [
+      "<strong>乡村+居家养老精准聚焦：</strong>锁定“乡村”和“居家”两个关键维度",
+      "<strong>供需双侧分析：</strong>“供给短板”与“民意需求”形成对照"
+    ]
+  },
+  {
+    id: 11,
+    section: "社区养老与社会保障",
+    title: "老有护，险知否——长期护理保险在城镇居民中的认知盲区与参保顾虑研究",
+    oneliner: "巧用古诗句式，认知盲区切角独特，从认知到行动的转化障碍",
+    advantages: [
+      "<strong>标题巧用古诗句式：</strong>“老有护，险知否”化用“知否知否”",
+      "<strong>“认知盲区”切角独特：</strong>长护险推广难往往不是产品问题而是认知问题",
+      "<strong>“参保顾虑”落点务实：</strong>从认知到行动的转化障碍，有政策参考价值"
+    ]
+  },
+  {
+    id: 12,
+    section: "低空经济与新技术",
+    title: "“头顶上的新邻居”——低空经济场景下县域居民的接受度与顾虑调查",
+    oneliner: "用邻里比喻降低技术陌生感，县域居民视角独特少见",
+    advantages: [
+      "<strong>“头顶上的新邻居”形象生动：</strong>用邻里比喻让抽象的低空经济可感可知",
+      "<strong>县域居民视角独特：</strong>通常从技术和产业角度讨论，从居民视角切入少见",
+      "<strong>接受度+顾虑双维度：</strong>便于提出治理建议"
+    ]
+  },
+  {
+    id: 13,
+    section: "低空经济与新技术",
+    title: "云端速递，喜忧参半——低空经济中无人机物流等应用场景的公众接受度与治理诉求调研",
+    oneliner: "“喜忧参半”定位客观，“治理诉求”拔高立意",
+    advantages: [
+      "<strong>“喜忧参半”定位客观：</strong>不做价值预设，承认技术应用的双面性",
+      "<strong>“治理诉求”拔高立意：</strong>提炼公众对治理框架的期望，政策参考价值高"
+    ]
+  },
+  {
+    id: 14,
+    section: "低空经济与新技术",
+    title: "硅基为伴，温情何度——家用AI机器人进入日常生活的伦理风险感知与使用意愿调研",
+    oneliner: "“硅基为伴”意象新颖，伦理+意愿双维度，家用场景具象",
+    advantages: [
+      "<strong>“硅基为伴”意象新颖：</strong>“硅基”替代直白说AI，“为伴”点出陪伴场景",
+      "<strong>伦理+意愿双维度：</strong>不是简单的赞成/反对二元调查",
+      "<strong>场景具象（家用）：</strong>锁定“家用”，调研对象和问题更容易落地"
+    ]
+  },
+  {
+    id: 15,
+    section: "低空经济与新技术",
+    title: "低空经济“到户”的社区适应性与风险社会下的公众信任建构",
+    oneliner: "“到户”具象化 + “风险社会”理论视野 + “信任建构”建设性",
+    advantages: [
+      "<strong>“到户”具象化：</strong>将低空经济落到最末梢的社区场景，研究颗粒度细",
+      "<strong>“风险社会”理论视野：</strong>引入贝克理论框架，学术层次高",
+      "<strong>“信任建构”建设性：</strong>最终指向如何建构信任，解决方案导向"
+    ]
+  },
+  {
+    id: 16,
+    section: "青年发展与城市归属感",
+    title: "“来了就是温州人？”——青年发展型城市下在温外地青年的归属感与真实留存意愿调查",
+    oneliner: "标题以问句开场有对话感，“真实”二字暗示政策与意愿的落差",
+    advantages: [
+      "<strong>标题以问句开场有对话感：</strong>不是陈述是追问，直接引发思考",
+      "<strong>“真实留存意愿”切中要害：</strong>“真实”二字暗示人才政策与真实意愿之间可能存在落差",
+      "<strong>青年+外地双重标签：</strong>聚焦最流动、最敏感的人群",
+      "<strong>“青年发展型城市”政策呼应：</strong>紧扣当前国家和地方政策热点"
+    ]
+  },
+  {
+    id: 17,
+    section: "乡村振兴与侨乡发展",
+    title: "跨境电商时代温州侨贸小商品产业转型升级机遇与挑战实证分析",
+    oneliner: "温州独有的侨贸小商品标签 + 跨境电商时代感 + 机遇挑战双面分析",
+    advantages: [
+      "<strong>温州特色鲜明：</strong>侨贸小商品是温州独有的经济标签",
+      "<strong>“跨境电商”时代感强：</strong>传统侨贸如何借跨境电商转型是当下真问题",
+      "<strong>机遇+挑战双面分析：</strong>不是单边唱好或唱衰，结构客观"
+    ]
+  }
+];
+// STATE
+const STORAGE_KEY = 'mmyb_votes_v2';
+let votes = {};
+let myVotes = {};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      votes = parsed.votes || {};
+      myVotes = parsed.myVotes || {};
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ votes, myVotes }));
+}
+
+function getVote(id) { return votes[id] || 0; }
+
+function getMaxVote() {
+  let max = 0;
+  for (const id in votes) { if (votes[id] > max) max = votes[id]; }
+  return max;
+}
+
+function renderAll() { renderNav(); renderTopics(); renderStats(); }
+
+function renderNav() {
+  var sections = [];
+  TOPICS.forEach(function(t) { if (sections.indexOf(t.section) === -1) sections.push(t.section); });
+  var nav = document.getElementById('navInner');
+  var html = '';
+  sections.forEach(function(s, i) {
+    var cls = i === 0 ? 'nav-chip active' : 'nav-chip';
+    html += '<span class="' + cls + '" data-section="' + s + '" onclick="filterSection(this,\'' + s.replace(/'/g, '\\\'') + '\')">' + s + '</span>';
+  });
+  html += '<span class="nav-chip" data-section="all" onclick="filterSection(this,\'all\')">全部选题</span>';
+  nav.innerHTML = html;
+}
+
+function filterSection(chip, section) {
+  document.querySelectorAll('.nav-chip').forEach(function(c) { c.classList.remove('active'); });
+  chip.classList.add('active');
+  document.querySelectorAll('.section').forEach(function(el) {
+    el.style.display = (section === 'all' || el.dataset.section === section) ? '' : 'none';
+  });
+}
+
+function renderTopics() {
+  var main = document.getElementById('mainContent');
+  var bySection = {};
+  TOPICS.forEach(function(t) {
+    if (!bySection[t.section]) bySection[t.section] = [];
+    bySection[t.section].push(t);
+  });
+
+  var maxVote = getMaxVote();
+  var html = '';
+
+  Object.keys(bySection).forEach(function(section) {
+    var topics = bySection[section];
+    var sectionId = section.replace(/\s+/g, '_');
+    html += '<div class="section" data-section="' + section + '" id="sec_' + sectionId + '">';
+    html += '<div class="section-head"><h2>' + section + '</h2><span class="badge">' + topics.length + '题</span></div>';
+    html += '<div class="topic-grid">';
+
+    topics.forEach(function(t) {
+      var v = getVote(t.id);
+      var barPct = maxVote > 0 ? Math.round((v / maxVote) * 100) : 0;
+      var isMyVote = !!myVotes[t.id];
+      var cardClass = isMyVote ? 'topic-card self-voted' : 'topic-card';
+      var btnClass = isMyVote ? 'vote-btn voted' : 'vote-btn';
+      var btnText = isMyVote ? '\u2713 已投票' : '\u2605 投票';
+
+      html += '<div class="' + cardClass + '" id="card_' + t.id + '">';
+      html += '<span class="idx">#' + t.id + '</span>';
+      html += '<h3>' + t.title + '</h3>';
+      html += '<div class="oneliner">' + t.oneliner + '</div>';
+      html += '<ul class="advantages">';
+      t.advantages.forEach(function(a) { html += '<li>' + a + '</li>'; });
+      html += '</ul>';
+      html += '<div class="vote-row">';
+      html += '<button class="' + btnClass + '" id="btn_' + t.id + '" onclick="toggleVote(' + t.id + ')">' + btnText + '</button>';
+      html += '<span class="vote-count" id="vc_' + t.id + '">' + v + ' 票</span>';
+      html += '<div class="vote-bar-wrap"><div class="vote-bar-fill" style="width:' + barPct + '%"></div></div>';
+      html += '</div></div>';
+    });
+
+    html += '</div></div>';
+  });
+
+  main.innerHTML = html;
+}
+
+function renderStats() {
+  document.getElementById('totalTopics').textContent = TOPICS.length;
+  var totalVotes = Object.values(votes).reduce(function(a, b) { return a + b; }, 0);
+  document.getElementById('totalVotes').textContent = totalVotes;
+  var totalVoters = Object.keys(myVotes).length;
+  document.getElementById('totalVoters').textContent = totalVoters;
+
+  var leadId = null, leadCount = 0;
+  Object.keys(votes).forEach(function(id) {
+    if (votes[id] > leadCount) { leadCount = votes[id]; leadId = +id; }
+  });
+  if (leadId && leadCount > 0) {
+    var t = TOPICS.find(function(x) { return x.id === leadId; });
+    document.getElementById('leadTopic').textContent = t ? '#' + leadId : '\u2014';
+    document.getElementById('leadTopic').title = t ? t.title : '';
+  } else {
+    document.getElementById('leadTopic').textContent = '\u2014';
+  }
+}
+
+function toggleVote(id) {
+  if (myVotes[id]) {
+    delete myVotes[id];
+    votes[id] = Math.max(0, (votes[id] || 0) - 1);
+    saveState(); renderAll(); refreshFilter();
+    showToast('已取消投票');
+  } else {
+    myVotes[id] = true;
+    votes[id] = (votes[id] || 0) + 1;
+    saveState(); renderAll(); refreshFilter();
+    showToast('投票成功！可继续为其他选题投票');
+  }
+}
+
+function refreshFilter() {
+  var activeChip = document.querySelector('.nav-chip.active');
+  if (activeChip) {
+    var section = activeChip.dataset.section;
+    if (section && section !== 'all') {
+      document.querySelectorAll('.section').forEach(function(el) {
+        el.style.display = el.dataset.section !== section ? 'none' : '';
+      });
+    }
+  }
+}
+
+function resetMyVotes() {
+  var count = Object.keys(myVotes).length;
+  if (count === 0) { showToast('你还没有投过票'); return; }
+  if (!confirm('你已为 ' + count + ' 个选题投票，确定要取消全部投票吗？')) return;
+  Object.keys(myVotes).forEach(function(id) {
+    votes[id] = Math.max(0, (votes[id] || 0) - 1);
+  });
+  myVotes = {};
+  saveState(); renderAll(); refreshFilter();
+  showToast('已取消全部投票');
+}
+
+var toastTimer;
+function showToast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.classList.remove('show'); }, 1800);
+}
+
+loadState();
+renderAll();
+
+(function() {
+  var firstChip = document.querySelector('.nav-chip');
+  if (firstChip) {
+    var section = firstChip.dataset.section;
+    if (section && section !== 'all') {
+      document.querySelectorAll('.section').forEach(function(el) {
+        if (el.dataset.section !== section) el.style.display = 'none';
+      });
+    }
+  }
+})();
+</script>
+</body>
+</html>
