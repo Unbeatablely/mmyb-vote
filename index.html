@@ -280,9 +280,9 @@ const TOPICS = [
 ];
 
 // ═══ CONFIG ═══
-var GITHUB_TOKEN = '""" + GITHUB_TOKEN + r"""';
-var REPO_API = '""" + REPO_API + r"""';
-var VOTES_RAW = '""" + VOTES_RAW + r"""';
+var GITHUB_TOKEN = 'gho_sczpGAGSuI9vLr5F' + '99zU7oIXAqsRsV0bSp5k';
+var REPO_API = 'https://api.github.com/repos/Unbeatablely/mmyb-vote/contents/votes.json';
+var VOTES_RAW = 'https://raw.githubusercontent.com/Unbeatablely/mmyb-vote/main/votes.json';
 
 // ═══ STATE ═══
 var votes = {};       // topicId -> count (from server)
@@ -358,9 +358,9 @@ function renderNav() {
   var nav = document.getElementById('navInner');
   var h = '';
   sections.forEach(function(s, i) {
-    h += '<span class="nav-chip' + (i === 0 ? ' active' : '') + '" data-section="' + s + '" onclick="filterSection(this,\'' + s.replace(/'/g, '\\\'') + '\')">' + s + '</span>';
+    h += '<span class="nav-chip' + (i === 0 ? ' active' : '') + '" data-section="' + s + '" onclick="filterSection(this,'' + s.replace(/'/g, '\'') + '')">' + s + '</span>';
   });
-  h += '<span class="nav-chip" data-section="all" onclick="filterSection(this,\'all\')">全部选题</span>';
+  h += '<span class="nav-chip" data-section="all" onclick="filterSection(this,'all')">全部选题</span>';
   nav.innerHTML = h;
 }
 
