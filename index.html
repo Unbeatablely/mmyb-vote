@@ -58,6 +58,19 @@
   .reset-area { text-align:center; margin-top:32px; }
   .reset-btn { display:inline-block; padding:8px 24px; border-radius:20px; font-size:13px; cursor:pointer; border:1px dashed #c4b99a; background:transparent; color:#9b8b6e; font-weight:500; transition:all .15s; }
   .reset-btn:hover { border-color:var(--accent); color:var(--accent); background:#fef6f6; }
+  .leaderboard { max-width:1200px; margin:0 auto 20px; padding:0 24px; }
+  .lb-inner { background:var(--card); border-radius:var(--radius); padding:18px 24px; box-shadow:var(--shadow); }
+  .lb-title { font-size:16px; font-weight:700; margin-bottom:12px; color:#3d2e1c; }
+  .lb-list { display:flex; flex-wrap:wrap; gap:8px; }
+  .lb-item { display:flex; align-items:center; gap:8px; padding:6px 14px; border-radius:20px; background:var(--tag-bg); font-size:13px; border:1px solid var(--border); min-width:0; }
+  .lb-item.top1 { background:linear-gradient(135deg,#fff9c4,#ffd54f); border-color:#ffc107; font-weight:700; }
+  .lb-item.top2 { background:linear-gradient(135deg,#f5f5f5,#cfd8dc); border-color:#90a4ae; font-weight:700; }
+  .lb-item.top3 { background:linear-gradient(135deg,#fbe9e7,#ffab91); border-color:#ff7043; font-weight:700; }
+  .lb-medal { font-size:18px; flex-shrink:0; }
+  .lb-tid { color:var(--muted); font-weight:600; flex-shrink:0; }
+  .lb-name { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; }
+  .lb-votes { font-weight:700; color:var(--accent); flex-shrink:0; }
+  .lb-empty { color:var(--muted); font-size:13px; padding:8px 0; }
 </style>
 </head>
 <body>
@@ -77,6 +90,12 @@
   <div class="stat-card"><div class="num" id="leadTopic">—</div><div class="lbl">当前领先</div></div>
 </div>
 
+<div id="leaderboard" class="leaderboard" style="display:none">
+  <div class="lb-inner">
+    <div class="lb-title">🏆 实时排行榜</div>
+    <div class="lb-list" id="lbList"></div>
+  </div>
+</div>
 <div class="nav-wrap"><div class="nav-inner" id="navInner"></div></div>
 <div class="main" id="mainContent"></div>
 <div class="reset-area"><button class="reset-btn" onclick="resetMyVotes()">&#8634; 取消我的全部投票</button></div>
@@ -442,6 +461,32 @@ function renderStats() {
   } else {
     document.getElementById('leadTopic').textContent = '—';
   }
+  renderLeaderboard();
+}
+
+function renderLeaderboard() {
+  var lb = document.getElementById('leaderboard');
+  var list = document.getElementById('lbList');
+  var ranked = Object.entries(votes).filter(function(e) { return e[1] > 0; }).sort(function(a, b) { return b[1] - a[1]; });
+  if (ranked.length === 0) {
+    lb.style.display = 'none';
+    return;
+  }
+  lb.style.display = '';
+  var medals = ['','🥇','🥈','🥉'];
+  var topClass = ['','top1','top2','top3'];
+  var h = '';
+  ranked.forEach(function(e, i) {
+    var tid = e[0], cnt = e[1];
+    var t = TOPICS.find(function(x) { return x.id === +tid; });
+    var name = t ? t.title : ('选题#' + tid);
+    // Truncate long titles
+    if (name.length > 30) name = name.substring(0, 28) + '…';
+    var cls = i < 3 ? 'lb-item ' + topClass[i+1] : 'lb-item';
+    var medal = i < 3 ? '<span class="lb-medal">' + medals[i+1] + '</span>' : '<span class="lb-tid">#' + tid + '</span>';
+    h += '<div class="' + cls + '">' + medal + '<span class="lb-name">' + name + '</span><span class="lb-votes">' + cnt + '票</span></div>';
+  });
+  list.innerHTML = h;
 }
 
 // ═══ VOTE ═══
