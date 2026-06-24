@@ -5,213 +5,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>民生民意杯 · 选题投票系统</title>
 <style>
-  :root {
-    --bg: #f5f3ef;
-    --card: #ffffff;
-    --text: #2c2416;
-    --muted: #6b5e4a;
-    --accent: #b5343a;
-    --accent-hover: #8b1a1f;
-    --gold: #c49b2c;
-    --gold-light: #fdf3d0;
-    --border: #e0d8c8;
-    --tag-bg: #faf6ed;
-    --shadow: 0 2px 12px rgba(0,0,0,.06);
-    --shadow-hover: 0 8px 30px rgba(0,0,0,.10);
-    --radius: 12px;
-    --radius-sm: 6px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.7;
-    min-height: 100vh;
-  }
-
-  .header {
-    background: linear-gradient(135deg, #3d2e1c 0%, #5a3e2b 40%, #8b5a3c 100%);
-    color: #faf6ed;
-    padding: 48px 24px 40px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L55 30 L30 55 L5 30Z' fill='none' stroke='rgba(255,255,255,.04)' stroke-width='1'/%3E%3C/svg%3E") repeat;
-    pointer-events: none;
-  }
-  .header-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
-  .header .tag {
-    display: inline-block;
-    border: 1px solid rgba(255,255,255,.3);
-    color: #f0d78c;
-    font-size: 13px;
-    padding: 4px 16px;
-    border-radius: 20px;
-    letter-spacing: .08em;
-    margin-bottom: 16px;
-  }
-  .header h1 {
-    font-size: clamp(26px, 5vw, 44px);
-    font-weight: 800;
-    letter-spacing: .03em;
-    margin-bottom: 8px;
-  }
-  .header .sub {
-    font-size: 15px;
-    opacity: .75;
-    font-weight: 400;
-  }
-
-  .stats-bar {
-    max-width: 1200px;
-    margin: -18px auto 0;
-    padding: 0 24px;
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    position: relative;
-    z-index: 2;
-  }
-  .stat-card {
-    flex: 1 1 140px;
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    box-shadow: var(--shadow);
-    text-align: center;
-    min-width: 120px;
-  }
-  .stat-card .num { font-size: 28px; font-weight: 800; color: var(--accent); }
-  .stat-card .lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-  .main { max-width: 1200px; margin: 28px auto 60px; padding: 0 24px; }
-
-  .section { margin-bottom: 36px; scroll-margin-top: 20px; }
-  .section-head {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 16px; padding-left: 4px;
-  }
-  .section-head h2 { font-size: 20px; font-weight: 700; letter-spacing: .02em; }
-  .section-head .badge {
-    font-size: 12px; background: var(--tag-bg); color: var(--muted);
-    padding: 2px 10px; border-radius: 12px; border: 1px solid var(--border);
-  }
-
-  .topic-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 18px;
-  }
-  .topic-card {
-    background: var(--card); border-radius: var(--radius);
-    padding: 22px 24px 18px; box-shadow: var(--shadow);
-    border: 1px solid transparent;
-    transition: box-shadow .2s, border-color .2s, transform .2s;
-    display: flex; flex-direction: column; position: relative;
-  }
-  .topic-card:hover {
-    box-shadow: var(--shadow-hover); border-color: var(--border);
-    transform: translateY(-2px);
-  }
-  .topic-card .idx {
-    position: absolute; top: 14px; right: 16px;
-    font-size: 12px; color: #c4b99a; font-weight: 600; letter-spacing: .04em;
-  }
-  .topic-card h3 {
-    font-size: 16px; font-weight: 700; line-height: 1.5;
-    margin-bottom: 10px; padding-right: 40px; color: #3d2e1c;
-  }
-  .topic-card .oneliner {
-    font-size: 13px; color: var(--accent); background: #fef6f6;
-    padding: 6px 12px; border-radius: var(--radius-sm);
-    margin-bottom: 14px; border-left: 3px solid var(--accent); line-height: 1.5;
-  }
-  .topic-card .advantages {
-    list-style: none; font-size: 13px; color: var(--muted); flex: 1;
-  }
-  .topic-card .advantages li {
-    padding: 3px 0 3px 18px; position: relative; line-height: 1.6;
-  }
-  .topic-card .advantages li::before {
-    content: '✦'; position: absolute; left: 0;
-    color: #c49b2c; font-size: 8px; top: 6px;
-  }
-  .topic-card .advantages li strong { color: #5a3e2b; font-weight: 600; }
-
-  .vote-row {
-    display: flex; align-items: center; gap: 10px;
-    margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);
-  }
-  .vote-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 7px 18px; border-radius: 20px;
-    font-size: 13px; font-weight: 600; cursor: pointer;
-    border: 1.5px solid var(--border); background: #fff;
-    color: var(--muted); transition: all .18s;
-    user-select: none; white-space: nowrap;
-  }
-  .vote-btn:hover { border-color: var(--accent); color: var(--accent); background: #fef6f6; }
-  .vote-btn.voted {
-    background: var(--accent); color: #fff; border-color: var(--accent);
-    box-shadow: 0 2px 8px rgba(181,52,58,.3);
-  }
-  .vote-btn.voted:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-  .vote-count { font-size: 13px; font-weight: 600; color: var(--muted); min-width: 48px; text-align: center; }
-  .vote-bar-wrap { flex: 1; height: 6px; background: #f0ebe0; border-radius: 3px; overflow: hidden; min-width: 40px; }
-  .vote-bar-fill {
-    height: 100%; background: linear-gradient(90deg, #e0c87c, #c49b2c);
-    border-radius: 3px; transition: width .4s ease;
-  }
-
-  .nav-wrap {
-    position: sticky; top: 0; z-index: 10;
-    background: rgba(245,243,239,.92); backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 24px; overflow-x: auto; white-space: nowrap;
-  }
-  .nav-wrap::-webkit-scrollbar { height: 0; }
-  .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 6px; flex-wrap: nowrap; }
-  .nav-chip {
-    display: inline-block; padding: 6px 14px; border-radius: 18px;
-    font-size: 13px; cursor: pointer; border: 1px solid var(--border);
-    background: #fff; color: var(--muted); font-weight: 500;
-    transition: all .15s; white-space: nowrap; flex-shrink: 0;
-  }
-  .nav-chip:hover { border-color: var(--accent); color: var(--accent); }
-  .nav-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-  .toast {
-    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
-    background: #3d2e1c; color: #faf6ed; padding: 10px 24px;
-    border-radius: 24px; font-size: 14px; font-weight: 600;
-    z-index: 999; opacity: 0; pointer-events: none;
-    transition: opacity .3s; box-shadow: 0 6px 20px rgba(0,0,0,.25);
-  }
-  .toast.show { opacity: 1; }
-
-  .footer { text-align: center; padding: 24px; font-size: 12px; color: #b8a98b; }
-
-  @media (max-width: 500px) {
-    .topic-grid { grid-template-columns: 1fr; }
-    .topic-card { padding: 18px 16px 14px; }
-    .topic-card h3 { font-size: 15px; }
-  }
-
-  .topic-card.self-voted { border-color: #e8c8ca; background: #fffcfc; }
-
-  .reset-area { text-align: center; margin-top: 32px; }
-  .reset-btn {
-    display: inline-block; padding: 8px 24px; border-radius: 20px;
-    font-size: 13px; cursor: pointer; border: 1px dashed #c4b99a;
-    background: transparent; color: #9b8b6e; font-weight: 500; transition: all .15s;
-  }
-  .reset-btn:hover { border-color: var(--accent); color: var(--accent); background: #fef6f6; }
+  :root { --bg:#f5f3ef; --card:#fff; --text:#2c2416; --muted:#6b5e4a; --accent:#b5343a; --accent-hover:#8b1a1f; --gold:#c49b2c; --gold-light:#fdf3d0; --border:#e0d8c8; --tag-bg:#faf6ed; --shadow:0 2px 12px rgba(0,0,0,.06); --shadow-hover:0 8px 30px rgba(0,0,0,.10); --radius:12px; --radius-sm:6px; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text); line-height:1.7; min-height:100vh; }
+  .header { background:linear-gradient(135deg,#3d2e1c,#5a3e2b 40%,#8b5a3c); color:#faf6ed; padding:48px 24px 40px; text-align:center; position:relative; overflow:hidden; }
+  .header::before { content:''; position:absolute; inset:0; background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L55 30 L30 55 L5 30Z' fill='none' stroke='rgba(255,255,255,.04)' stroke-width='1'/%3E%3C/svg%3E") repeat; pointer-events:none; }
+  .header-inner { position:relative; z-index:1; max-width:900px; margin:0 auto; }
+  .header .tag { display:inline-block; border:1px solid rgba(255,255,255,.3); color:#f0d78c; font-size:13px; padding:4px 16px; border-radius:20px; letter-spacing:.08em; margin-bottom:16px; }
+  .header h1 { font-size:clamp(26px,5vw,44px); font-weight:800; letter-spacing:.03em; margin-bottom:8px; }
+  .header .sub { font-size:15px; opacity:.75; }
+  .stats-bar { max-width:1200px; margin:-18px auto 0; padding:0 24px; display:flex; gap:16px; flex-wrap:wrap; position:relative; z-index:2; }
+  .stat-card { flex:1 1 140px; background:var(--card); border-radius:var(--radius); padding:16px 20px; box-shadow:var(--shadow); text-align:center; min-width:120px; }
+  .stat-card .num { font-size:28px; font-weight:800; color:var(--accent); }
+  .stat-card .lbl { font-size:12px; color:var(--muted); margin-top:2px; }
+  .main { max-width:1200px; margin:28px auto 60px; padding:0 24px; }
+  .section { margin-bottom:36px; scroll-margin-top:20px; }
+  .section-head { display:flex; align-items:center; gap:12px; margin-bottom:16px; padding-left:4px; }
+  .section-head h2 { font-size:20px; font-weight:700; }
+  .section-head .badge { font-size:12px; background:var(--tag-bg); color:var(--muted); padding:2px 10px; border-radius:12px; border:1px solid var(--border); }
+  .topic-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:18px; }
+  .topic-card { background:var(--card); border-radius:var(--radius); padding:22px 24px 18px; box-shadow:var(--shadow); border:1px solid transparent; transition:box-shadow .2s,border-color .2s,transform .2s; display:flex; flex-direction:column; position:relative; }
+  .topic-card:hover { box-shadow:var(--shadow-hover); border-color:var(--border); transform:translateY(-2px); }
+  .topic-card .idx { position:absolute; top:14px; right:16px; font-size:12px; color:#c4b99a; font-weight:600; }
+  .topic-card h3 { font-size:16px; font-weight:700; line-height:1.5; margin-bottom:10px; padding-right:40px; color:#3d2e1c; }
+  .topic-card .oneliner { font-size:13px; color:var(--accent); background:#fef6f6; padding:6px 12px; border-radius:var(--radius-sm); margin-bottom:14px; border-left:3px solid var(--accent); line-height:1.5; }
+  .topic-card .advantages { list-style:none; font-size:13px; color:var(--muted); flex:1; }
+  .topic-card .advantages li { padding:3px 0 3px 18px; position:relative; line-height:1.6; }
+  .topic-card .advantages li::before { content:'✦'; position:absolute; left:0; color:#c49b2c; font-size:8px; top:6px; }
+  .topic-card .advantages li strong { color:#5a3e2b; font-weight:600; }
+  .vote-row { display:flex; align-items:center; gap:10px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+  .vote-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 18px; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer; border:1.5px solid var(--border); background:#fff; color:var(--muted); transition:all .18s; user-select:none; white-space:nowrap; }
+  .vote-btn:hover { border-color:var(--accent); color:var(--accent); background:#fef6f6; }
+  .vote-btn.voted { background:var(--accent); color:#fff; border-color:var(--accent); box-shadow:0 2px 8px rgba(181,52,58,.3); }
+  .vote-btn.voted:hover { background:var(--accent-hover); border-color:var(--accent-hover); }
+  .vote-btn.loading { opacity:.6; pointer-events:none; }
+  .vote-count { font-size:13px; font-weight:600; color:var(--muted); min-width:48px; text-align:center; }
+  .vote-bar-wrap { flex:1; height:6px; background:#f0ebe0; border-radius:3px; overflow:hidden; min-width:40px; }
+  .vote-bar-fill { height:100%; background:linear-gradient(90deg,#e0c87c,#c49b2c); border-radius:3px; transition:width .4s ease; }
+  .nav-wrap { position:sticky; top:0; z-index:10; background:rgba(245,243,239,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); padding:10px 24px; overflow-x:auto; white-space:nowrap; }
+  .nav-wrap::-webkit-scrollbar { height:0; }
+  .nav-inner { max-width:1200px; margin:0 auto; display:flex; gap:6px; }
+  .nav-chip { display:inline-block; padding:6px 14px; border-radius:18px; font-size:13px; cursor:pointer; border:1px solid var(--border); background:#fff; color:var(--muted); font-weight:500; transition:all .15s; white-space:nowrap; flex-shrink:0; }
+  .nav-chip:hover { border-color:var(--accent); color:var(--accent); }
+  .nav-chip.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .sync-badge { display:inline-block; font-size:11px; padding:2px 10px; border-radius:10px; background:#e8f5e9; color:#2e7d32; margin-left:8px; font-weight:500; }
+  .sync-badge.syncing { background:#fff3e0; color:#e65100; }
+  .toast { position:fixed; bottom:32px; left:50%; transform:translateX(-50%); background:#3d2e1c; color:#faf6ed; padding:10px 24px; border-radius:24px; font-size:14px; font-weight:600; z-index:999; opacity:0; pointer-events:none; transition:opacity .3s; box-shadow:0 6px 20px rgba(0,0,0,.25); }
+  .toast.show { opacity:1; }
+  .footer { text-align:center; padding:24px; font-size:12px; color:#b8a98b; }
+  @media(max-width:500px){ .topic-grid{grid-template-columns:1fr} .topic-card{padding:18px 16px 14px} .topic-card h3{font-size:15px} }
+  .topic-card.self-voted { border-color:#e8c8ca; background:#fffcfc; }
+  .reset-area { text-align:center; margin-top:32px; }
+  .reset-btn { display:inline-block; padding:8px 24px; border-radius:20px; font-size:13px; cursor:pointer; border:1px dashed #c4b99a; background:transparent; color:#9b8b6e; font-weight:500; transition:all .15s; }
+  .reset-btn:hover { border-color:var(--accent); color:var(--accent); background:#fef6f6; }
 </style>
 </head>
 <body>
@@ -219,7 +65,7 @@
 <div class="header">
   <div class="header-inner">
     <span class="tag">浙江省民生民意杯</span>
-    <h1>选题投票系统</h1>
+    <h1>选题投票系统 <span class="sync-badge" id="syncBadge">☁ 云端同步</span></h1>
     <p class="sub">文旅融合 · 数字化传播 · 就业形态 · 社区养老 · 低空经济 · 青年发展</p>
   </div>
 </div>
@@ -231,22 +77,14 @@
   <div class="stat-card"><div class="num" id="leadTopic">—</div><div class="lbl">当前领先</div></div>
 </div>
 
-<div class="nav-wrap" id="navWrap">
-  <div class="nav-inner" id="navInner"></div>
-</div>
-
+<div class="nav-wrap"><div class="nav-inner" id="navInner"></div></div>
 <div class="main" id="mainContent"></div>
-
-<div class="reset-area">
-  <button class="reset-btn" onclick="resetMyVotes()">&#8634; 取消我的全部投票</button>
-</div>
-
+<div class="reset-area"><button class="reset-btn" onclick="resetMyVotes()">&#8634; 取消我的全部投票</button></div>
 <div class="toast" id="toast"></div>
-
-<div class="footer">浙江省民生民意杯 · 选题投票系统 — 数据存储在浏览器本地</div>
+<div class="footer">浙江省民生民意杯 · 选题投票系统 — 数据云端同步 · 所有人可见</div>
 
 <script>
-// DATA
+// ═══ DATA ═══
 const TOPICS = [
   {
     id: 1,
@@ -440,47 +278,90 @@ const TOPICS = [
     ]
   }
 ];
-// STATE
-const STORAGE_KEY = 'mmyb_votes_v2';
-let votes = {};
-let myVotes = {};
 
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      votes = parsed.votes || {};
-      myVotes = parsed.myVotes || {};
+// ═══ CONFIG ═══
+var GITHUB_TOKEN = '""" + GITHUB_TOKEN + r"""';
+var REPO_API = '""" + REPO_API + r"""';
+var VOTES_RAW = '""" + VOTES_RAW + r"""';
+
+// ═══ STATE ═══
+var votes = {};       // topicId -> count (from server)
+var myVotes = {};     // topicId -> true (local only)
+var voteSha = null;   // SHA of votes.json on server for updates
+
+// ═══ API ═══
+function fetchVotes(cb) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', VOTES_RAW + '?t=' + Date.now(), true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        votes = data;
+        renderAll();
+        var badge = document.getElementById('syncBadge');
+        if (badge) { badge.textContent = '☁ 云端同步'; badge.className = 'sync-badge'; }
+      } catch(e) { console.error('Parse error:', e); }
     }
-  } catch(e) {}
+    if (cb) cb();
+  };
+  xhr.onerror = function() { if (cb) cb(); };
+  xhr.send();
 }
 
-function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ votes, myVotes }));
+function saveVotes(cb) {
+  var json = JSON.stringify(votes, null, 2);
+  var payload = {
+    message: 'vote update',
+    content: btoa(unescape(encodeURIComponent(json)))
+  };
+  if (voteSha) payload.sha = voteSha;
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('PUT', REPO_API, true);
+  xhr.setRequestHeader('Authorization', 'Bearer ' + GITHUB_TOKEN);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function() {
+    if (xhr.status === 200 || xhr.status === 201) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        voteSha = data.content.sha;
+      } catch(e) {}
+    }
+    if (cb) cb();
+  };
+  xhr.onerror = function() { if (cb) cb(); };
+  xhr.send(JSON.stringify(payload));
 }
 
-function getVote(id) { return votes[id] || 0; }
-
-function getMaxVote() {
-  let max = 0;
-  for (const id in votes) { if (votes[id] > max) max = votes[id]; }
-  return max;
+function loadMyVotes() {
+  try {
+    var raw = localStorage.getItem('mmyb_myvotes');
+    if (raw) myVotes = JSON.parse(raw);
+  } catch(e) { myVotes = {}; }
 }
 
-function renderAll() { renderNav(); renderTopics(); renderStats(); }
+function saveMyVotes() {
+  localStorage.setItem('mmyb_myvotes', JSON.stringify(myVotes));
+}
+
+// ═══ RENDER ═══
+function renderAll() {
+  renderNav();
+  renderTopics();
+  renderStats();
+}
 
 function renderNav() {
   var sections = [];
   TOPICS.forEach(function(t) { if (sections.indexOf(t.section) === -1) sections.push(t.section); });
   var nav = document.getElementById('navInner');
-  var html = '';
+  var h = '';
   sections.forEach(function(s, i) {
-    var cls = i === 0 ? 'nav-chip active' : 'nav-chip';
-    html += '<span class="' + cls + '" data-section="' + s + '" onclick="filterSection(this,\'' + s.replace(/'/g, '\\\'') + '\')">' + s + '</span>';
+    h += '<span class="nav-chip' + (i === 0 ? ' active' : '') + '" data-section="' + s + '" onclick="filterSection(this,\'' + s.replace(/'/g, '\\\'') + '\')">' + s + '</span>';
   });
-  html += '<span class="nav-chip" data-section="all" onclick="filterSection(this,\'all\')">全部选题</span>';
-  nav.innerHTML = html;
+  h += '<span class="nav-chip" data-section="all" onclick="filterSection(this,\'all\')">全部选题</span>';
+  nav.innerHTML = h;
 }
 
 function filterSection(chip, section) {
@@ -489,6 +370,14 @@ function filterSection(chip, section) {
   document.querySelectorAll('.section').forEach(function(el) {
     el.style.display = (section === 'all' || el.dataset.section === section) ? '' : 'none';
   });
+}
+
+function getVote(id) { return votes[id] || 0; }
+
+function getMaxVote() {
+  var max = 0;
+  Object.keys(votes).forEach(function(id) { if (votes[id] > max) max = votes[id]; });
+  return max;
 }
 
 function renderTopics() {
@@ -500,84 +389,96 @@ function renderTopics() {
   });
 
   var maxVote = getMaxVote();
-  var html = '';
+  var h = '';
 
   Object.keys(bySection).forEach(function(section) {
     var topics = bySection[section];
-    var sectionId = section.replace(/\s+/g, '_');
-    html += '<div class="section" data-section="' + section + '" id="sec_' + sectionId + '">';
-    html += '<div class="section-head"><h2>' + section + '</h2><span class="badge">' + topics.length + '题</span></div>';
-    html += '<div class="topic-grid">';
+    var sid = section.replace(/\s+/g, '_');
+    h += '<div class="section" data-section="' + section + '" id="sec_' + sid + '">';
+    h += '<div class="section-head"><h2>' + section + '</h2><span class="badge">' + topics.length + '题</span></div>';
+    h += '<div class="topic-grid">';
 
     topics.forEach(function(t) {
       var v = getVote(t.id);
       var barPct = maxVote > 0 ? Math.round((v / maxVote) * 100) : 0;
-      var isMyVote = !!myVotes[t.id];
-      var cardClass = isMyVote ? 'topic-card self-voted' : 'topic-card';
-      var btnClass = isMyVote ? 'vote-btn voted' : 'vote-btn';
-      var btnText = isMyVote ? '\u2713 已投票' : '\u2605 投票';
+      var isMine = !!myVotes[t.id];
+      var cc = isMine ? 'topic-card self-voted' : 'topic-card';
+      var bc = isMine ? 'vote-btn voted' : 'vote-btn';
+      var bt = isMine ? '✓ 已投票' : '★ 投票';
 
-      html += '<div class="' + cardClass + '" id="card_' + t.id + '">';
-      html += '<span class="idx">#' + t.id + '</span>';
-      html += '<h3>' + t.title + '</h3>';
-      html += '<div class="oneliner">' + t.oneliner + '</div>';
-      html += '<ul class="advantages">';
-      t.advantages.forEach(function(a) { html += '<li>' + a + '</li>'; });
-      html += '</ul>';
-      html += '<div class="vote-row">';
-      html += '<button class="' + btnClass + '" id="btn_' + t.id + '" onclick="toggleVote(' + t.id + ')">' + btnText + '</button>';
-      html += '<span class="vote-count" id="vc_' + t.id + '">' + v + ' 票</span>';
-      html += '<div class="vote-bar-wrap"><div class="vote-bar-fill" style="width:' + barPct + '%"></div></div>';
-      html += '</div></div>';
+      h += '<div class="' + cc + '" id="card_' + t.id + '">';
+      h += '<span class="idx">#' + t.id + '</span>';
+      h += '<h3>' + t.title + '</h3>';
+      h += '<div class="oneliner">' + t.oneliner + '</div>';
+      h += '<ul class="advantages">';
+      t.advantages.forEach(function(a) { h += '<li>' + a + '</li>'; });
+      h += '</ul>';
+      h += '<div class="vote-row">';
+      h += '<button class="' + bc + '" id="btn_' + t.id + '" onclick="toggleVote(' + t.id + ')">' + bt + '</button>';
+      h += '<span class="vote-count" id="vc_' + t.id + '">' + v + ' 票</span>';
+      h += '<div class="vote-bar-wrap"><div class="vote-bar-fill" style="width:' + barPct + '%"></div></div>';
+      h += '</div></div>';
     });
 
-    html += '</div></div>';
+    h += '</div></div>';
   });
 
-  main.innerHTML = html;
+  main.innerHTML = h;
 }
 
 function renderStats() {
   document.getElementById('totalTopics').textContent = TOPICS.length;
-  var totalVotes = Object.values(votes).reduce(function(a, b) { return a + b; }, 0);
-  document.getElementById('totalVotes').textContent = totalVotes;
-  var totalVoters = Object.keys(myVotes).length;
-  document.getElementById('totalVoters').textContent = totalVoters;
+  var tv = 0;
+  Object.keys(votes).forEach(function(id) { tv += (votes[id] || 0); });
+  document.getElementById('totalVotes').textContent = tv;
+  document.getElementById('totalVoters').textContent = Object.keys(myVotes).length;
 
   var leadId = null, leadCount = 0;
   Object.keys(votes).forEach(function(id) {
     if (votes[id] > leadCount) { leadCount = votes[id]; leadId = +id; }
   });
   if (leadId && leadCount > 0) {
-    var t = TOPICS.find(function(x) { return x.id === leadId; });
-    document.getElementById('leadTopic').textContent = t ? '#' + leadId : '\u2014';
-    document.getElementById('leadTopic').title = t ? t.title : '';
+    document.getElementById('leadTopic').textContent = '#' + leadId;
   } else {
-    document.getElementById('leadTopic').textContent = '\u2014';
+    document.getElementById('leadTopic').textContent = '—';
   }
 }
 
+// ═══ VOTE ═══
 function toggleVote(id) {
+  var btn = document.getElementById('btn_' + id);
+  if (btn) btn.classList.add('loading');
+
   if (myVotes[id]) {
+    // Unvote
     delete myVotes[id];
     votes[id] = Math.max(0, (votes[id] || 0) - 1);
-    saveState(); renderAll(); refreshFilter();
-    showToast('已取消投票');
+    saveMyVotes();
+    saveVotes(function() {
+      renderAll();
+      refreshFilter();
+      showToast('已取消投票');
+    });
   } else {
+    // Vote
     myVotes[id] = true;
     votes[id] = (votes[id] || 0) + 1;
-    saveState(); renderAll(); refreshFilter();
-    showToast('投票成功！可继续为其他选题投票');
+    saveMyVotes();
+    saveVotes(function() {
+      renderAll();
+      refreshFilter();
+      showToast('投票成功！已云端同步');
+    });
   }
 }
 
 function refreshFilter() {
-  var activeChip = document.querySelector('.nav-chip.active');
-  if (activeChip) {
-    var section = activeChip.dataset.section;
-    if (section && section !== 'all') {
+  var chip = document.querySelector('.nav-chip.active');
+  if (chip) {
+    var s = chip.dataset.section;
+    if (s && s !== 'all') {
       document.querySelectorAll('.section').forEach(function(el) {
-        el.style.display = el.dataset.section !== section ? 'none' : '';
+        el.style.display = el.dataset.section !== s ? 'none' : '';
       });
     }
   }
@@ -586,15 +487,20 @@ function refreshFilter() {
 function resetMyVotes() {
   var count = Object.keys(myVotes).length;
   if (count === 0) { showToast('你还没有投过票'); return; }
-  if (!confirm('你已为 ' + count + ' 个选题投票，确定要取消全部投票吗？')) return;
+  if (!confirm('你已为 ' + count + ' 个选题投票，确定要取消全部吗？')) return;
   Object.keys(myVotes).forEach(function(id) {
     votes[id] = Math.max(0, (votes[id] || 0) - 1);
   });
   myVotes = {};
-  saveState(); renderAll(); refreshFilter();
-  showToast('已取消全部投票');
+  saveMyVotes();
+  saveVotes(function() {
+    renderAll();
+    refreshFilter();
+    showToast('已取消全部投票并同步云端');
+  });
 }
 
+// ═══ TOAST ═══
 var toastTimer;
 function showToast(msg) {
   var el = document.getElementById('toast');
@@ -604,16 +510,21 @@ function showToast(msg) {
   toastTimer = setTimeout(function() { el.classList.remove('show'); }, 1800);
 }
 
-loadState();
+// ═══ INIT ═══
+loadMyVotes();
 renderAll();
+fetchVotes();
+
+// Refresh votes from server every 10 seconds
+setInterval(function() { fetchVotes(); }, 10000);
 
 (function() {
-  var firstChip = document.querySelector('.nav-chip');
-  if (firstChip) {
-    var section = firstChip.dataset.section;
-    if (section && section !== 'all') {
+  var chip = document.querySelector('.nav-chip');
+  if (chip) {
+    var s = chip.dataset.section;
+    if (s && s !== 'all') {
       document.querySelectorAll('.section').forEach(function(el) {
-        if (el.dataset.section !== section) el.style.display = 'none';
+        if (el.dataset.section !== s) el.style.display = 'none';
       });
     }
   }
